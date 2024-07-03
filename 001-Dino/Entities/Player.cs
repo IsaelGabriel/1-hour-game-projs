@@ -10,7 +10,6 @@ public class Player : IEntity
 
     private const float Gravity = 1200f;
     private const float JumpVelocity = 700f;
-    private const float JumpDuration = 0.01f;
     private static readonly float defaultY = MainScene.GroundY - Height;
 
     public const int x = 50;
@@ -22,15 +21,20 @@ public class Player : IEntity
 
     public void Update()
     {
-        jumpCount -= Raylib.GetFrameTime();
 
         if(Raylib.IsKeyPressed(KeyboardKey.Space) && canJump) {
             yVelocity = -JumpVelocity;
-            jumpCount = JumpDuration;
             canJump = false;
-        }else if(jumpCount <= 0f) {
-            yVelocity += Gravity * Raylib.GetFrameTime();
         }
+
+        float mult = 1f;
+
+        if(yVelocity > 0f && Raylib.IsKeyDown(KeyboardKey.Down)) {
+            mult = 4f;
+        }
+        yVelocity += mult * Gravity * Raylib.GetFrameTime();
+        
+
 
         y += yVelocity * Raylib.GetFrameTime();
 

@@ -2,24 +2,28 @@ using Raylib_cs;
 
 public class MainScene : IEntity {
     public const int GroundY = Game.WindowHeight - 50;
-    public const float MaxObstacleInterval = 2f;
+    public const float MaxObstacleInterval = 5f;
     public const float MinObstacleInterval = 0.5f;
-    public const float MaxObstacleHeight = Player.Height;
-    public const float MinObstacleHeight = Player.Height / 2;
+    public const float MaxObstacleHeight = Player.Height / 2;
+    public const float MinObstacleHeight = Player.Height / 3;
 
     private Player player = new Player();
 
     private List<Rectangle> obstacles = [];
     private float obstacleInterval = 0f;
     private static Random rng = new Random();
-    private float obstacleSpeed = 100f;
+    private const float BaseObstacleSpeed = 200f;
+    private float obstacleSpeed = BaseObstacleSpeed;
 
 
     public void Update() {
+        obstacleSpeed += Raylib.GetFrameTime() * 10f;
         obstacleInterval -= Raylib.GetFrameTime();
         if(obstacleInterval <= 0f) {
             GenerateObstacle();
+            float intervalT = BaseObstacleSpeed / obstacleSpeed;
             obstacleInterval = (float) rng.NextDouble() * MaxObstacleInterval + MinObstacleInterval;
+            obstacleInterval *= intervalT;
         }
 
         for(int i = 0; i < obstacles.Count(); i++) {
@@ -28,7 +32,11 @@ public class MainScene : IEntity {
             obstacles[i] = rect;
         }
 
-        if(obstacles[0].X < -Player.Width) obstacles.RemoveAt(0);
+        if(obstacles.Count() > 0) {
+            if(obstacles[0].X < -Player.Width)
+                obstacles.RemoveAt(0);
+
+        }
 
         player.Update();
     }
